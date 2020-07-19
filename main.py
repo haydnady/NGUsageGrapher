@@ -1,7 +1,6 @@
 import plotly.graph_objects as go
 import pandas as pd
 import datetime
-import os
 
 
 # Insert file name/path
@@ -27,10 +26,10 @@ for i, row in df.iterrows():
     dateSplit = row["ReadDate & Days"].replace(" & ", "/").replace(" Days", "").split("/")
 
     df.loc[[i], "Month Names"] = datetime.date(1900, int(dateSplit[0]), 1).strftime("%B")
-    df.loc[[i], "Months"] = dateSplit[0]
-    df.loc[[i], "Days"] = dateSplit[1]
-    df.loc[[i], "Years"] = dateSplit[2]
-    df.loc[[i], "Total of Days"] = dateSplit[3]
+    df.loc[[i], "Months"] = int(dateSplit[0])
+    df.loc[[i], "Days"] = int(dateSplit[1])
+    df.loc[[i], "Years"] = int(dateSplit[2])
+    df.loc[[i], "Total of Days"] = int(dateSplit[3])
 
 # Sort data ascending.
 df.sort_values(by=["Years", "Months"], inplace=True, ascending=True)
@@ -60,5 +59,3 @@ fig.update_layout(barmode="group",
                   xaxis_tickangle=-45)
 
 fig.show()
-
-print(df)
