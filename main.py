@@ -7,7 +7,9 @@ import os
 # Insert file name/path
 FILENAME = "./NationalgridSampleData/ElectricityTableViewdata7_1_2020.csv"
 
-data = pd.read_csv(FILENAME)
+# Only read needed fields in file
+fields = ["ReadDate & Days", "Total kWh", "Total Charges"]
+df = pd.read_csv(FILENAME, skipinitialspace=True, usecols=fields)
 
 """ 
     Split date data into sections i.e. "2/2/2020" becomes ["2", "2", "2020"].
@@ -15,35 +17,35 @@ data = pd.read_csv(FILENAME)
     in dataframe.
 """
 dateSplit = []
-data.insert(0, "Month Names", 0)
-data.insert(1, "Months", 0)
-data.insert(2, "Days", 0)
-data.insert(3, "Years", 0)
-data.insert(4, "Total of Days", 0)
+df.insert(0, "Month Names", 0, allow_duplicates=False)
+df.insert(1, "Months", 0, allow_duplicates=False)
+df.insert(2, "Days", 0, allow_duplicates=False)
+df.insert(3, "Years", 0, allow_duplicates=False)
+df.insert(4, "Total of Days", 0, allow_duplicates=False)
 
-for i, row in data.iterrows():
+for i, row in df.iterrows():
     dateSplit = row["ReadDate & Days"].replace(" & ", "/").replace(" Days", "").split("/")
 
-    data["Month Names"][i] = datetime.date(1900, int(dateSplit[0]), 1).strftime("%B")
-    data["Months"][i] = dateSplit[0]
-    data["Days"][i] = dateSplit[1]
-    data["Years"][i] = dateSplit[2]
-    data["Total of Days"][i] = dateSplit[3]
+    df.loc[[i], "Month Names"] = datetime.date(1900, int(dateSplit[0]), 1).strftime("%B")
+    df.loc[[i], "Months"] = dateSplit[0]
+    df.loc[[i], "Days"] = dateSplit[1]
+    df.loc[[i], "Years"] = dateSplit[2]
+    df.loc[[i], "Total of Days"] = dateSplit[3]
 
 # Sort data ascending.
-data.sort_values(by=["Years", "Months"], inplace=True, ascending=True)
+df.sort_values(by=["Years", "Months"], inplace=True, ascending=True)
 
 
 # Create data dictionnary
 dtDictList = []
-yearList = data.Years.unique()
+yearList = df.Years.unique()
 for uniqueYear in yearList:
     dtDictList.append(dict(type="bar",
-                           x=data[data.Years == uniqueYear]["Month Names"],
-                           y=data[data.Years == uniqueYear]["Total kWh"],
+                           x=df[df.Years == uniqueYear]["Month Names"],
+                           y=df[df.Years == uniqueYear]["Total kWh"],
 
                            name=str(uniqueYear),
-                           text=data[data.Years == uniqueYear]["Total Charges"],
+                           text=df[df.Years == uniqueYear]["Total Charges"],
                            textposition="auto"
                           )
                       )
@@ -58,3 +60,5 @@ fig.update_layout(barmode="group",
                   xaxis_tickangle=-45)
 
 fig.show()
+
+print(df)
