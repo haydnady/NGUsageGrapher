@@ -1,10 +1,11 @@
 import plotly.graph_objects as go
 import pandas as pd
 import datetime
+import os
 
 
 # Insert file name/path
-FILENAME = "FILENAME"
+FILENAME = "./NationalgridSampleData/ElectricityTableViewdata7_1_2020.csv"
 
 data = pd.read_csv(FILENAME)
 
@@ -23,8 +24,7 @@ data.insert(4, "Total of Days", 0)
 for i, row in data.iterrows():
     dateSplit = row["ReadDate & Days"].replace(" & ", "/").replace(" Days", "").split("/")
 
-    data["Month Names"][i] = datetime.date(
-        1900, int(dateSplit[0]), 1).strftime("%B")
+    data["Month Names"][i] = datetime.date(1900, int(dateSplit[0]), 1).strftime("%B")
     data["Months"][i] = dateSplit[0]
     data["Days"][i] = dateSplit[1]
     data["Years"][i] = dateSplit[2]
@@ -35,11 +35,9 @@ data.sort_values(by=["Years", "Months"], inplace=True, ascending=True)
 
 
 # Create data dictionnary
-yearList = data.Years.unique()
 dtDictList = []
+yearList = data.Years.unique()
 for uniqueYear in yearList:
-    print(uniqueYear)
-
     dtDictList.append(dict(type="bar",
                            x=data[data.Years == uniqueYear]["Month Names"],
                            y=data[data.Years == uniqueYear]["Total kWh"],
@@ -49,7 +47,6 @@ for uniqueYear in yearList:
                            textposition="auto"
                           )
                       )
-
 
 # Add traces
 fig = go.Figure(data=dtDictList)
